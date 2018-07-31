@@ -92,7 +92,7 @@ function InitChannel(channel,ipIndex,ip,prt,okFunc,failFunc){
             var flag = 0;
             if(sock.SubBuffer && sock.SubBufferLen>0){
                 flag = sock.SubBuffer.length - sock.SubBufferLen;
-                data.copy(sock.SubBuffer,sock.SubBufferLen, 0, flag - 1);
+                data.copy(sock.SubBuffer,sock.SubBufferLen, 0, flag + 4);
                 sock.emit("rtpData",sock.SubBuffer);
 
                 sock.SubBufferLen = 0;
@@ -104,12 +104,12 @@ function InitChannel(channel,ipIndex,ip,prt,okFunc,failFunc){
 
                 if ((flag+4+len) <= data.length)
                 {
-                    data.copy(sock.SubBuffer, 0, flag, flag + len - 1);
+                    data.copy(sock.SubBuffer, 0, flag, flag + len + 4);
                     sock.emit("rtpData",sock.SubBuffer);
                     sock.SubBufferLen = 0;
                 }
                 else {
-                    data.copy(sock.SubBuffer, 0, flag,data.length - 1);
+                    data.copy(sock.SubBuffer, 0, flag,data.length + 4);
                     sock.SubBufferLen = data.length - flag;
                 }
                 flag += 4;
