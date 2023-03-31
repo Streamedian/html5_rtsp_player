@@ -39,9 +39,34 @@ const path = require('path');
 //
 // }
 export default {
-    entry: path.join(__dirname, 'player.js'),
-    targets: [
-        {dest: path.join(__dirname, 'example/streamedian.min.js'), format: 'iife'}
+    input: path.join(__dirname, 'player.js'),
+    output: [
+        {
+            file: 'dist/index.amd.js',
+            format: 'amd'
+        },
+        {
+            file: 'dist/index.cjs.js',
+            format: 'cjs'
+        },
+        {
+            file: 'dist/index.es.js',
+            format: 'es'
+        },
+        {
+            file: 'dist/index.iife.js',
+            format: 'iife',
+            name: 'MyLibrary'
+        },
+        {
+            file: 'dist/index.umd.js',
+            format: 'umd',
+            name: 'MyLibrary'
+        },
+        {
+            file: 'dist/index.system.js',
+            format: 'system',
+        },
     ],
     sourceMap: true,
     plugins: [

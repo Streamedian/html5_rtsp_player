@@ -1,6 +1,6 @@
-import {getTagged} from './deps/bp_logger.js';
-import {Url} from './core/util/url.js';
-import {Remuxer} from './core/remuxer/remuxer.js';
+import { getTagged } from './deps/bp_logger.js';
+import { Url } from './core/util/url.js';
+import { Remuxer } from './core/remuxer/remuxer.js';
 import DEFAULT_CLIENT from './client/rtsp/client.js';
 import DEFAULT_TRANSPORT from './transport/websocket.js';
 import SMediaError from './media_error';
@@ -9,8 +9,8 @@ import { MediaRecorder } from './recorder.js';
 const Log = getTagged('wsp');
 
 export class StreamType {
-    static get HLS() {return 'hls';}
-    static get RTSP() {return 'rtsp';}
+    static get HLS() { return 'hls'; }
+    static get RTSP() { return 'rtsp'; }
 
     static isSupported(type) {
         return [StreamType.HLS, StreamType.RTSP].includes(type);
@@ -28,7 +28,7 @@ export class StreamType {
                 return StreamType.RTSP;
             case 'http':
             case 'https':
-                if (url.indexOf('.m3u8')>=0) {
+                if (url.indexOf('.m3u8') >= 0) {
                     return StreamType.HLS;
                 } else {
                     return null;
@@ -72,7 +72,7 @@ export class WSPlayer {
         this.queryCredentials = opts.queryCredentials || null;
 
         this.bufferDuration_ = opts.bufferDuration || 120;
-        if(isNaN(this.bufferDuration_) || (this.bufferDuration_ <= 0)){
+        if (isNaN(this.bufferDuration_) || (this.bufferDuration_ <= 0)) {
             Log.warn("Expected number type for bufferDuration");
             this.bufferDuration_ = 120;
         }
@@ -95,7 +95,7 @@ export class WSPlayer {
                 Log.warn(`Client stream type ${client.streamType()} is incompatible with transport types [${transport.streamTypes().join(', ')}]. Skip`)
             }
         }
-        
+
         this.type = StreamType.RTSP;
         this.url = null;
         if (opts.url && opts.type) {
@@ -103,7 +103,7 @@ export class WSPlayer {
             this.type = opts.type;
         } else {
             if (!this._checkSource(this.player)) {
-                for (let i=0; i<this.player.children.length; ++i) {
+                for (let i = 0; i < this.player.children.length; ++i) {
                     if (this._checkSource(this.player.children[i])) {
                         break;
                     }
@@ -118,7 +118,7 @@ export class WSPlayer {
             this.setSource(this.url, this.type);
         }
 
-        this.player.addEventListener('play', ()=>{
+        this.player.addEventListener('play', () => {
             this.continuousRecording.pause(false);
             this.eventRecording.pause(false);
 
@@ -127,23 +127,23 @@ export class WSPlayer {
             }
         }, false);
 
-        this.player.addEventListener('pause', ()=>{
+        this.player.addEventListener('pause', () => {
             this.client.stop();
             this.continuousRecording.pause(true);
             this.eventRecording.pause(true);
         }, false);
 
-        this.player.addEventListener('seeking', ()=>{
-            if(this.player.buffered.length) {
+        this.player.addEventListener('seeking', () => {
+            if (this.player.buffered.length) {
                 let bStart = this.player.buffered.start(0);
-                let bEnd   = this.player.buffered.end(0);
+                let bEnd = this.player.buffered.end(0);
                 let bDuration = bEnd - bStart;
 
                 if (bDuration > 0 && (this.player.currentTime < bStart || this.player.currentTime > bEnd)) {
-                    if(this.player.currentTime < bStart){
+                    if (this.player.currentTime < bStart) {
                         this.player.currentTime = bStart;
                     }
-                    else{
+                    else {
                         this.player.currentTime = bEnd - 1;
                     }
                 }
@@ -156,12 +156,12 @@ export class WSPlayer {
             this.transport.disconnect().then(() => {
                 this.client.destroy();
             });
-        }, false);		
+        }, false);
 
         this.redirectNativeMediaErrors = opts.hasOwnProperty('redirectNativeMediaErrors') ?
             opts.redirectNativeMediaErrors : true;
 
-        if(this.redirectNativeMediaErrors) {
+        if (this.redirectNativeMediaErrors) {
             this.player.addEventListener('error', () => {
                 this.error(this.player.error.code);
             }, false);
@@ -229,26 +229,26 @@ export class WSPlayer {
         this.url = url;
         let transport = this.modules[type].transport;
         this.transport = new transport.constructor(this.endpoint, this.type, transport.options);
-        this.transport.eventSource.addEventListener('error', (errorEvent)=>{
+        this.transport.eventSource.addEventListener('error', (errorEvent) => {
             this.error(errorEvent.detail);
         });
-        this.transport.eventSource.addEventListener('info', (infoEvent)=>{
+        this.transport.eventSource.addEventListener('info', (infoEvent) => {
             this.info(infoEvent.detail)
         });
 
         let lastType = this.type;
-        this.type = (StreamType.isSupported(type)?type:false) || StreamType.fromMime(type);
+        this.type = (StreamType.isSupported(type) ? type : false) || StreamType.fromMime(type);
         if (!this.type) {
             this.error(SMediaError.MEDIA_ERR_SRC_NOT_SUPPORTED);
             return;
         }
 
-        if (lastType!=this.type || !this.client) {
+        if (lastType != this.type || !this.client) {
             if (this.client) {
                 await this.client.destroy();
             }
             let client = this.modules[type].client;
-            let opts = {errorHandler: this.errorHandler, flush: 200};
+            let opts = { errorHandler: this.errorHandler, flush: 200 };
             this.client = new client(opts);
         } else {
             this.client.reset();
@@ -278,24 +278,24 @@ export class WSPlayer {
         }
     }
 
-    set bufferDuration(duration){
-        if(this.remuxer && this.remuxer.MSE) {
+    set bufferDuration(duration) {
+        if (this.remuxer && this.remuxer.MSE) {
             this.bufferDuration_ = duration;
             this.remuxer.MSE.bufferDuration = duration;
         }
     }
 
-    get bufferDuration(){
-        if(this.remuxer)
+    get bufferDuration() {
+        if (this.remuxer)
             return this.remuxer.MSE.bufferDuration;
         else
             return undefined;
     }
 
-    error(err){
+    error(err) {
         if (err !== undefined) {
             this.error_ = new SMediaError(err);
-            if (this.errorHandler){
+            if (this.errorHandler) {
                 Log.error(this.error_.message);
                 this.errorHandler(this.error_);
             }
@@ -303,17 +303,17 @@ export class WSPlayer {
         return this.error_;
     }
 
-    info(inf){
+    info(inf) {
         if (inf !== undefined) {
-            if (this.infoHandler){
+            if (this.infoHandler) {
                 this.infoHandler(inf);
             }
         }
     }
 
-    mediadata(data, prefix){
+    mediadata(data, prefix) {
         if (data !== undefined) {
-            if (this.dataHandler){
+            if (this.dataHandler) {
                 this.dataHandler(data, prefix);
             }
         }
@@ -321,7 +321,7 @@ export class WSPlayer {
 
     start() {
         if (this.client) {
-            this.client.start().catch((e)=>{
+            this.client.start().catch((e) => {
                 if (this.errorHandler) {
                     this.errorHandler(e);
                 }
