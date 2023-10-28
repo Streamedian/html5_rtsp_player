@@ -212,7 +212,7 @@ Remuxer collects data into mp4 media fragments (moof+mdat) and pass it into sour
 
 RTSP player establish connection with proxy with following protocol:
 
-1. Connect to RTSP channel by connecting websocket with "rtsp" protocol specified and get connection id
+1. Connect to RTSP channel by connecting websocket with "rtsp" protocol specified and get connection id:
 
     ```
     c>s:
@@ -229,7 +229,7 @@ RTSP player establish connection with proxy with following protocol:
     Error codes >= 400 means error
     ```
 
-2. Connect to RTP channel by connecting websocket with "rtp" protocol
+2. Connect to RTP channel by connecting websocket with "rtp" protocol:
 
     ```
     c>s:
