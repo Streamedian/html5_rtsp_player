@@ -26,7 +26,7 @@ Streamedian is written using ECMAScript 2015 standard.
 
 ## Live test stream
 
-Demo is available on https://streamedian.com/demonstration/
+Demo is available on https://streamedian.com
 
 Browser support (ES5 transpiled version):
 
